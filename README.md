@@ -1,16 +1,14 @@
 # greenness
 
-A Python reproduction of the functional-data-analysis + universal-kriging pipeline from:
+R and Python implementations of the functional-data-analysis + universal-kriging pipeline from:
 
 > Hosseini, R. (2024). **Exploring Universal Kriging Modelling for Functional Greenness Data Captured by Digital Webcams.** ICSTA 2024 Proceedings.
 > [ICSTA_174.pdf](https://www.avestia.com/ICSTA2024_Proceedings/files/paper/ICSTA_174.pdf)
 
-The original analysis was implemented in R. This repository contains two parallel R codebases plus a Python port:
+This repository contains two implementations of the same pipeline:
 
-- [`R/`](R/) — a clean, documented rewrite of the analysis (`00_setup.R` … `08_figures.R`), organized as one pipeline stage per file with roxygen-style function docs.
-- [`src/greenness/`](src/greenness/) — the same method ported to open-source Python (numpy / scipy / pandas), starting from the compiled daily greenness time series and reproducing every modelling step described in the paper.
-
-The original, exploratory R scripts this analysis started from are kept privately outside this repository rather than published here. The notes below describe what they contained and what was found while rewriting them, for provenance, without including the scripts themselves.
+- [`R/`](R/) — a documented R implementation (`00_setup.R` … `08_figures.R`), organized as one pipeline stage per file with roxygen-style function docs.
+- [`src/greenness/`](src/greenness/) — the same method implemented in open-source Python (numpy / scipy / pandas), starting from the compiled daily greenness time series and reproducing every modelling step described in the paper.
 
 ## What this is about
 
@@ -23,41 +21,22 @@ Two spatial predictors are compared, matching the paper:
 
 Both are evaluated with a Monte Carlo leave-out study (random train/test camera splits, RMSPE per held-out camera), matching the paper's evaluation.
 
-## Method map: R (original, private) → R (clean) → Python
+## Method map: R ↔ Python
 
-| Step | R original (private, not in this repo) | R clean (`R/`) | Python (`src/greenness/`) |
-|---|---|---|---|
-| Package/path setup | scattered `library()` calls per script | [`00_setup.R`](R/00_setup.R) | package imports in each module |
-| Raw AMOS image download (upstream, not reproduced in Python) | `myfunctions.R`, `Greenness_loading.R` | [`01_data_acquisition.R`](R/01_data_acquisition.R) | — |
-| Load per-camera CSVs, clean, impute → (day × camera) matrix | `SpatialTemporalGreenness.R`, `Functional Analysis for year 2015.R` | [`02_load_and_clean_data.R`](R/02_load_and_clean_data.R): `load_greenness_dataset()` | [`greenness.data.build_dataset`](src/greenness/data.py) |
-| B-spline smoothing, GCV-selected penalty | `Lambda_GCV`, `Smooth_GVS` (`fda::create.bspline.basis`, `fdPar`, `smooth.basis`) | [`03_functional_smoothing.R`](R/03_functional_smoothing.R): `gcv_lambda_search()`, `smooth_greenness_gcv()` | [`greenness.smoothing`](src/greenness/smoothing.py) |
-| Functional PCA + varimax rotation | `pca.fd`, `varmx.pca.fd` | [`03_functional_smoothing.R`](R/03_functional_smoothing.R): `rotated_fpca()` | [`greenness.fpca`](src/greenness/fpca.py) |
-| UTrK / UCoK prediction | `Fit_Utrk`, `Fit_Ucok_rpc` (`my_kriging_functions.R`) | [`04_kriging_models.R`](R/04_kriging_models.R): `fit_utrk()`, `fit_ucok()` | [`greenness.kriging`](src/greenness/kriging.py) |
-| Monte Carlo RMSPE evaluation | `generate.path`, `generate.path_2` | [`05_monte_carlo_evaluation.R`](R/05_monte_carlo_evaluation.R): `run_monte_carlo_study()` | [`greenness.evaluate`](src/greenness/evaluate.py) |
-| End-to-end example run | `UCoK& UTrK.R` | [`06_run_analysis_2015.R`](R/06_run_analysis_2015.R) | `scripts/run_pipeline.py` |
-| Optimal new-camera sampling design (extension, not in the paper) | `Sampling_functions.R`, `Sampling-Kriging.R`, `UCOK_sampling.R` | [`07_optimal_sampling_design.R`](R/07_optimal_sampling_design.R) | — |
-| Figures (raw vs. smoothed curves) | *(ad hoc plotting code scattered in `To_check_2015.R`)* | [`08_figures.R`](R/08_figures.R): `plot_smoothed_curves()` | `scripts/make_figures.py` |
+| Step | R (`R/`) | Python (`src/greenness/`) |
+|---|---|---|
+| Package/path setup | [`00_setup.R`](R/00_setup.R) | package imports in each module |
+| Raw AMOS image download (upstream, not reproduced in Python) | [`01_data_acquisition.R`](R/01_data_acquisition.R) | — |
+| Load per-camera CSVs, clean, impute → (day × camera) matrix | [`02_load_and_clean_data.R`](R/02_load_and_clean_data.R): `load_greenness_dataset()` | [`greenness.data.build_dataset`](src/greenness/data.py) |
+| B-spline smoothing, GCV-selected penalty | [`03_functional_smoothing.R`](R/03_functional_smoothing.R): `gcv_lambda_search()`, `smooth_greenness_gcv()` | [`greenness.smoothing`](src/greenness/smoothing.py) |
+| Functional PCA + varimax rotation | [`03_functional_smoothing.R`](R/03_functional_smoothing.R): `rotated_fpca()` | [`greenness.fpca`](src/greenness/fpca.py) |
+| UTrK / UCoK prediction | [`04_kriging_models.R`](R/04_kriging_models.R): `fit_utrk()`, `fit_ucok()` | [`greenness.kriging`](src/greenness/kriging.py) |
+| Monte Carlo RMSPE evaluation | [`05_monte_carlo_evaluation.R`](R/05_monte_carlo_evaluation.R): `run_monte_carlo_study()` | [`greenness.evaluate`](src/greenness/evaluate.py) |
+| End-to-end example run | [`06_run_analysis_2015.R`](R/06_run_analysis_2015.R) | `scripts/run_pipeline.py` |
+| Optimal new-camera sampling design (extension, not in the paper) | [`07_optimal_sampling_design.R`](R/07_optimal_sampling_design.R) | — |
+| Figures (raw vs. smoothed curves) | [`08_figures.R`](R/08_figures.R): `plot_smoothed_curves()` | `scripts/make_figures.py` |
 
-### R code review: bugs found and fixed
-
-While rewriting the private original scripts into the clean `R/` scripts, two real bugs surfaced and were fixed (both were pre-existing in the original code, not introduced by the Python port):
-
-1. **`Fit_Utrk()` / `Fit_Ucok_rpc()` discarded their predictions.** In the original `my_kriging_functions.R`, both functions had a leftover debugging `return(Var_Utrk)` / `return(Sigma2_Ucok)` after the real result line (e.g. `# return(Result_Utrk)`), so only the kriging *variance* was ever returned — the predicted curves were computed but thrown away. Fixed in [`fit_utrk()` / `fit_ucok()`](R/04_kriging_models.R), which now return both `prediction` and `variance`.
-2. **`generate.path()` referenced an object that was never assigned.** `RMSPE_fun2` computed `sqrt(mean((test[,x] - Ucok_forecasted[[1]][,x])^2))`, but `Ucok_forecasted` was never created in that scope (the actual UCoK fit was stored under a different name, `cok2_forecasted` / `Ucok2_forecasted`) — running this as-is would raise an "object not found" error. Fixed in [`monte_carlo_iteration()`](R/05_monte_carlo_evaluation.R), which threads the real `fit_ucok()` return value through consistently.
-
-Two further original scripts, `Sampling-Kriging.R` and `UCOK_sampling.R`, depend on the external `spsann` package and reference objects (`candi1`, `SA_sampling_2`, `train`, `S_coordinates`) that are never defined in-file — they do not run as-is. Rather than guess at the missing pieces, [`07_optimal_sampling_design.R`](R/07_optimal_sampling_design.R) reimplements the same idea (simulated-annealing search for the variance-minimizing new-camera location) as a small, self-contained annealer with no undefined references.
-
-A fourth, data-driven issue (not a code bug, but worth documenting) surfaced when actually running the clean scripts against the real data: a handful of AMOS cameras share an exact `(lat, lon)` with another camera (e.g. 1306 and 1593), which makes the kriging covariance matrix exactly singular (`solve(): system is exactly singular`) whenever both end up in the same fit. `load_greenness_dataset()` now nudges duplicate-location cameras apart by a negligible, reproducible random offset (≤ 1e-4°, ~10 m) as its final cleaning step — see `jitter_duplicate_coordinates()` in [`02_load_and_clean_data.R`](R/02_load_and_clean_data.R).
-
-*Provenance note:* the original analysis never hit this error, but not because it was handled in code — comparing the original `Greenness_loading.R`'s broad 100-camera list (`camera_vec`) against the original `SpatialTemporalGreenness.R`'s trimmed 95-camera analysis list (`new_cameras_collection`) shows the latter is missing exactly five IDs: `1593`, `21745`, `21757`, `21759`, `21791` — precisely one camera from each of the five duplicate-coordinate pairs, and nothing else. So the original workflow sidestepped the singularity by hand-curating the camera list *before* it reached the kriging step, rather than by any reusable dedup/jitter logic. `02_load_and_clean_data.R` instead fixes this generically (keeps all cameras, nudges the duplicates), so it stays correct even if the raw data changes; set `jitter_duplicate_coords = FALSE` and manually exclude those five IDs if you need an exact camera-for-camera match to the original 95.
-
-### A bug introduced by this rewrite (not in the original), found via testing
-
-Unlike the four issues above, this one was not present in the original scripts — it was introduced while writing the clean `04_kriging_models.R` and only surfaced once the scripts were actually run against real data (this environment has no R interpreter, so the initial rewrite could only be checked by hand; see the caveat at the top of this section). In good conscience this needs to be called out as clearly as the others: `fit_ucok()` built `predicted_scores` with `vapply(score_forecasts, function(f) f$Forecast, numeric(nrow(new_coords)))`. `vapply()`/`sapply()` only return a matrix when each call produces a result of length > 1; when `new_coords` has exactly one row (a single held-out camera — exactly what the `06_run_analysis_2015.R` demo does), each call returns a length-1 result, so R silently collapses the output to a flat vector instead of a 1-row matrix. `t()` of that flat vector then has the wrong orientation, and `harmonic_vals %*% t(predicted_scores)` fails with "non-conformable arguments". Multi-camera calls (e.g. every Monte Carlo iteration) never hit this, since `nrow(new_coords) > 1` there. Fixed by building `predicted_scores` / `score_variance` with `do.call(cbind, ...)` instead, which always keeps the `(n_test x n_components)` shape regardless of how many test points there are.
-
-**Note:** these `R/` scripts were reviewed line-by-line and are believed correct, but could not be executed in the environment used to write them (no R interpreter was available there). Please run `source("R/06_run_analysis_2015.R")` locally as a sanity check before relying on them.
-
-Two implementation details are carried over from the R code deliberately, and documented here so results are interpretable:
+Two modeling choices are shared between the R and Python implementations, documented here so results are interpretable:
 
 1. **"Universal" kriging = constant drift only.** The R code calls `estimateDrift("~.", g, Intercept = TRUE)` with no extra covariates, so the estimated drift is just a global mean. That makes the "universal" kriging here mathematically equivalent to **ordinary kriging** with a global constant trend — this Python port reproduces exactly that, rather than a more general polynomial-drift universal kriging.
 2. **"Co"kriging = independent per-score kriging.** `predictFstat(..., .type = "UcoK", algIndependent = TRUE)` krige's each rotated FPC score on its own variogram, not via a true multivariate cross-covariance model. This port does the same (`fit_ucok` loops over components independently) — a natural extension would be a full linear model of coregionalization, noted as a possible future improvement.
@@ -74,13 +53,13 @@ Raw data lives in [`data/raw/`](data/raw/):
 
 A cleaned, ready-to-use copy is also saved at `data/processed/greenness_2015.csv` (365 × 87, raw NaNs preserved) and `data/processed/coords_2015.csv`.
 
-The raw AMOS *image* pipeline (downloading webcam photos and extracting the greenness index via the uRoI method) is **not** reproduced in Python — it's upstream of what the paper itself describes. The Google Drive downloader is kept as clean, documented R in [`R/01_data_acquisition.R`](R/01_data_acquisition.R), based on the private original `myfunctions.R` / `Greenness_loading.R`.
+The raw AMOS *image* pipeline (downloading webcam photos and extracting the greenness index via the uRoI method) is **not** reproduced in Python — it's upstream of what the paper itself describes. The Google Drive downloader is documented in [`R/01_data_acquisition.R`](R/01_data_acquisition.R).
 
 ## Repository layout
 
 ```
 greenness/
-├── R/                              # clean, documented R rewrite (source in numeric order)
+├── R/                              # documented R implementation (source in numeric order)
 │   ├── 00_setup.R                  #   packages, paths, shared constants
 │   ├── 01_data_acquisition.R       #   AMOS/Google Drive raw image download (upstream, optional)
 │   ├── 02_load_and_clean_data.R    #   load_greenness_dataset(): load, outlier-drop, LOCF impute
@@ -205,4 +184,4 @@ If you use this code, please cite the original paper:
 
 ## License
 
-[MIT](LICENSE) — see the LICENSE file. The paper PDF in `paper/` is included for reference/provenance and remains under its own copyright.
+[MIT](LICENSE) — see the LICENSE file. The paper PDF in `paper/` is included for reference and remains under its own copyright.

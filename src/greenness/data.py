@@ -1,12 +1,12 @@
 """
 Data loading utilities.
 
-Mirrors the data-assembly steps at the top of ``R/Functional Analysis for
-year 2015.R``: read one CSV per camera, pull out the greenness column for
-the requested year, reindex to a full day-of-year (DOY) axis, and stitch
-everything into a single (day x camera) matrix. Camera coordinates are then
-attached via the case-number -> AMOS-camera-ID -> (lat, lon) lookup chain
-(``CameraID.csv`` and ``amos_locations.xlsx``).
+Mirrors ``load_greenness_dataset`` in ``R/02_load_and_clean_data.R``: read
+one CSV per camera, pull out the greenness column for the requested year,
+reindex to a full day-of-year (DOY) axis, and stitch everything into a
+single (day x camera) matrix. Camera coordinates are then attached via the
+case-number -> AMOS-camera-ID -> (lat, lon) lookup chain (``CameraID.csv``
+and ``amos_locations.xlsx``).
 
 The raw per-camera pipeline that produces these CSVs from AMOS webcam
 images (the "uRoI" processing) is *not* reproduced here -- it is outside

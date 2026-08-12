@@ -16,7 +16,7 @@
 #'   (typically 1:365).
 #' @param nbasis Number of B-spline basis functions.
 #' @param norder Spline order (order = degree + 1); norder = 6 gives quintic
-#'   splines, matching the original analysis.
+#'   splines, matching the paper's approach.
 #' @param log10_lambda_grid Candidate log10(lambda) values to search.
 #' @return A data.frame with columns log10_lambda, df, gcv (one row per grid
 #'   point), sorted by log10_lambda.
@@ -35,9 +35,6 @@ gcv_lambda_search <- function(greenness, time_grid = DOY_RANGE, nbasis, norder =
 }
 
 #' Smooth a greenness matrix with the GCV-optimal roughness penalty.
-#'
-#' Equivalent to the original `Smooth_GVS()`, with the GCV search folded in
-#' and the camera-id labelling made explicit.
 #'
 #' @param greenness A (n_time x n_camera) numeric matrix with camera ids as
 #'   column names.

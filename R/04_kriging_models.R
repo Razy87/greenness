@@ -11,11 +11,7 @@
 #'     krige's each score, and reconstructs the predicted curve from the
 #'     kriged scores.
 #'
-#' NOTE on a fix relative to the original scripts: `Fit_Utrk()` and
-#' `Fit_Ucok()` originally ended with a leftover debugging
-#' `return(Var_Utrk)` / `return(Sigma2_Ucok)` that discarded the predicted
-#' curves and returned only the kriging variance. Both functions below
-#' return the full result (prediction *and* variance) as intended.
+#' Both functions below return the full result (prediction *and* variance).
 #'
 #' Source 00_setup.R and 03_functional_smoothing.R before this file.
 
@@ -52,8 +48,7 @@ fit_utrk <- function(greenness, train_coords, new_coords, model, n_lags, lag_max
 #' @param model A `gstat::vgm()` variogram model specification.
 #' @param n_lags,lag_max Passed to `fdagstat::fvariogram()`.
 #' @param force_nugget If not NULL, the nugget is fixed at this value rather
-#'   than estimated (the original analysis fixes it at 0 for the FPC-score
-#'   variograms).
+#'   than estimated (the paper fixes it at 0 for the FPC-score variograms).
 #' @return A list with `prediction` (n_time x n_test matrix, reconstructed
 #'   from the kriged scores) and `score_variance` (n_test x n_components).
 fit_ucok <- function(greenness, time_grid = DOY_RANGE, train_coords, new_coords,

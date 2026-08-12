@@ -6,13 +6,6 @@
 #' from the remaining ("training") cameras via UTrK and UCoK, and computes
 #' the root-mean-squared prediction error (RMSPE) per held-out camera.
 #'
-#' This consolidates and fixes the original `generate.path()` /
-#' `generate.path_2()`: those referenced an object named `Ucok_forecasted`
-#' that was never assigned (the actual UCoK result was stored as
-#' `Ucok2_forecasted` / `cok2_forecasted`), which would have raised an
-#' "object not found" error if run as-is. This version threads the actual
-#' `fit_ucok()` return value through consistently.
-#'
 #' Source 00_setup.R, 02_load_and_clean_data.R, 03_functional_smoothing.R,
 #' and 04_kriging_models.R before this file.
 
@@ -60,11 +53,7 @@ monte_carlo_iteration <- function(greenness, coords, train_frac, utrk_args = lis
   )
 }
 
-#' Model settings used per training fraction in the original study.
-#'
-#' Kept as an explicit, documented lookup table rather than the original's
-#' repeated `if (m == 0.8) {...} if (m == 0.7) {...}` blocks with duplicated
-#' bodies.
+#' Model settings used per training fraction in the paper.
 MC_SETTINGS_BY_TRAIN_FRAC <- list(
   `0.8` = list(
     utrk = list(model = gstat::vgm("Sph"), n_lags = 100, lag_max = 60),

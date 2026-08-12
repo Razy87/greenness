@@ -4,8 +4,7 @@ End-to-end demo of the full pipeline on the 2015 greenness dataset:
     load data -> smooth (GCV) -> FPCA + varimax -> UTrK & UCoK prediction
     -> Monte Carlo RMSPE evaluation
 
-Mirrors the overall flow of ``R/Functional Analysis for year 2015.R`` +
-``R/UCoK& UTrK.R`` + ``R/my_kriging_functions.R`` combined.
+Mirrors the overall flow of ``R/06_run_analysis_2015.R``.
 
 Usage:
     python scripts/run_pipeline.py

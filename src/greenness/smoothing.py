@@ -2,16 +2,16 @@
 B-spline smoothing with a roughness penalty and GCV-selected smoothing
 parameter.
 
-Mirrors ``Lambda_GCV`` and ``Smooth_GVS`` in ``R/my_kriging_functions.R``,
-which are thin wrappers around the R `fda` package's
-``create.bspline.basis`` / ``fdPar`` / ``smooth.basis``. Here the same
-smoothing-spline problem
+Mirrors ``gcv_lambda_search`` and ``smooth_greenness_gcv`` in
+``R/03_functional_smoothing.R``, which are thin wrappers around the R
+`fda` package's ``create.bspline.basis`` / ``fdPar`` / ``smooth.basis``.
+Here the same smoothing-spline problem
 
     minimize_c  ||y - B c||^2 + lambda * c' R c
 
 is solved directly with numpy/scipy, where ``B`` is the B-spline design
 matrix and ``R`` is the roughness penalty matrix built from the spline's
-4th derivative (``Lfdobj = 4`` in the original R code).
+4th derivative (``Lfdobj = 4`` in the R implementation).
 """
 from __future__ import annotations
 
@@ -92,8 +92,8 @@ def gcv_lambda_search(
 ) -> tuple[float, "np.ndarray"]:
     """Search a grid of smoothing parameters and return the GCV-optimal lambda.
 
-    Equivalent to ``Lambda_GCV`` in the R code (``loglam = seq(-3, 8, 0.25)``
-    by default there).
+    Equivalent to ``gcv_lambda_search`` in ``R/03_functional_smoothing.R``
+    (``log10_lambda_grid = seq(-3, 8, 0.25)`` by default there).
 
     Parameters
     ----------
@@ -103,8 +103,7 @@ def gcv_lambda_search(
     Returns
     -------
     (best_lambda, table)
-        ``table`` has columns [log10_lambda, df, gcv], one row per grid point,
-        matching the data.frame returned by ``Lambda_GCV`` in R.
+        ``table`` has columns [log10_lambda, df, gcv], one row per grid point.
     """
     if domain is None:
         domain = (float(np.min(x)), float(np.max(x)))
@@ -160,7 +159,7 @@ def smooth_with_gcv(
     deriv: int = 4,
     domain: tuple[float, float] | None = None,
 ) -> SmoothResult:
-    """One-call replacement for ``Smooth_GVS``: GCV-select lambda, then fit.
+    """One-call convenience wrapper: GCV-select lambda, then fit.
 
     y : array, shape (n_obs, n_curves) e.g. the (365 x n_camera) greenness matrix.
     x : array, shape (n_obs,) e.g. day-of-year 1..365.

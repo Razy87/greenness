@@ -6,9 +6,6 @@
 #'   load data -> GCV smoothing -> functional PCA -> UTrK & UCoK prediction
 #'   -> Monte Carlo RMSPE evaluation
 #'
-#' This replaces the original `UCoK& UTrK.R` as the main runnable example
-#' (that script is kept privately, outside this repo, for reference).
-#'
 #' Run from the repository root, e.g.:
 #'   Rscript R/06_run_analysis_2015.R
 

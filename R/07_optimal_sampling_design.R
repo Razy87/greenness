@@ -5,16 +5,9 @@
 #' An extension beyond the published paper: given the existing camera
 #' network, use simulated annealing to search candidate locations for a new
 #' camera that minimizes the mean UTrK/UCoK kriging variance -- i.e. finds
-#' where a new observation would most reduce prediction uncertainty.
-#'
-#' This consolidates the working parts of the original exploratory sampling
-#' scripts (`Sampling_functions.R`'s `SA_sampling_1`, `swap`, and the
-#' `ObjUSER_*` objective functions). Two other original scripts,
-#' `Sampling-Kriging.R` and `UCOK_sampling.R`, additionally depended on the
-#' external `spsann` package and on several objects that were never defined
-#' in those scripts (e.g. `candi1`, `SA_sampling_2`) -- they did not run
-#' as-is and are kept only privately (outside this repo) for reference. The self-contained
-#' annealer here (no `spsann` dependency) is the maintained version.
+#' where a new observation would most reduce prediction uncertainty. This is
+#' a small, self-contained annealer with no external dependencies beyond the
+#' packages loaded in 00_setup.R.
 #'
 #' Source 00_setup.R and 04_kriging_models.R before this file.
 

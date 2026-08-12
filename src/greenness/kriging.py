@@ -2,12 +2,12 @@
 Universal Trace-Kriging (UTrK) and Universal (Co)Kriging of rotated FPC
 scores (UCoK).
 
-Mirrors ``Fit_Utrk`` and ``Fit_Ucok_rpc`` in ``R/my_kriging_functions.R``,
-built on the `fdagstat` package's ``fstat`` / ``estimateDrift`` /
-``fvariogram`` / ``fitVariograms`` / ``predictFstat`` pipeline.
+Mirrors ``fit_utrk`` and ``fit_ucok`` in ``R/04_kriging_models.R``, built on
+the `fdagstat` package's ``fstat`` / ``estimateDrift`` / ``fvariogram`` /
+``fitVariograms`` / ``predictFstat`` pipeline.
 
-Two simplifying facts about the original R implementation carried over
-here on purpose (documented in the README):
+Two simplifying modeling choices, shared with the R implementation and
+documented in the README:
 
 1. ``estimateDrift("~.", g, Intercept = TRUE)`` with no extra covariates
    only ever estimates a constant (intercept) drift, so "universal"
@@ -93,7 +93,7 @@ def fit_utrk(
 ) -> UTrKResult:
     """Universal Trace-Kriging: one scalar trace-variogram fit on the raw
     curves, whose kriging weights are then applied directly to the curves
-    themselves. Equivalent to ``Fit_Utrk`` in the R code.
+    themselves. Equivalent to ``fit_utrk()`` in the R implementation.
 
     curves: (n_time, n_train) matrix, e.g. the smoothed 365 x n greenness matrix.
     """
@@ -108,7 +108,7 @@ def fit_utrk(
 class UCoKResult:
     prediction: np.ndarray  # (n_time, n_test) reconstructed predicted curves
     score_variance: np.ndarray  # (n_test, n_components) per-component kriging variance
-    total_variance: np.ndarray  # (n_test,) summed component variance (matches Sigma2_Ucok in R)
+    total_variance: np.ndarray  # (n_test,) summed component variance
     fpca: FPCAResult
     variograms: list[FittedVariogram]
 
@@ -127,7 +127,7 @@ def fit_ucok(
     force_nugget: bool = True,
 ) -> UCoKResult:
     """Universal (Co)Kriging of varimax-rotated FPC scores. Equivalent to
-    ``Fit_Ucok_rpc`` in the R code (with ``Pc_Number`` = ``n_components``).
+    ``fit_ucok()`` in the R implementation.
 
     curves: (n_time, n_train) matrix.
     doy: (n_time,) the day-of-year (or other) x-axis the curves are sampled on.

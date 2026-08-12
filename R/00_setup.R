@@ -2,10 +2,8 @@
 #' Setup: packages and global constants
 #' ============================================================================
 #'
-#' Source this file first. It loads only the packages actually used by the
-#' scripts in this folder (the original exploratory scripts accumulated a
-#' much longer, mostly-unused library list over time -- kept privately,
-#' outside this repo, for that history).
+#' Source this file first. It loads the packages used by the scripts in this
+#' folder and sets up shared paths and constants.
 #'
 #' Package roles:
 #'   fda, fda.usc      - B-spline bases, smoothing, functional PCA

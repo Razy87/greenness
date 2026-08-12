@@ -2,8 +2,7 @@
 Functional PCA + varimax rotation on B-spline-smoothed curves.
 
 Mirrors ``pca.fd`` / ``varmx.pca.fd`` from the R `fda` package, as used in
-``R/my_kriging_functions.R`` (``Fit_Ucok_rpc``) and
-``R/UCoK& UTrK.R``.
+``R/03_functional_smoothing.R`` (``rotated_fpca()``).
 
 Algorithm (standard functional-PCA-via-basis-expansion, Ramsay & Silverman
 2005, ch. 8): if curves are represented by B-spline coefficients ``C``

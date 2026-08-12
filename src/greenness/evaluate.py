@@ -1,8 +1,8 @@
 """
 Monte Carlo train/test RMSPE evaluation.
 
-Mirrors ``generate.path`` / ``generate.path_2`` in
-``R/my_kriging_functions.R``: repeatedly hold out a random subset of
+Mirrors ``monte_carlo_iteration`` / ``run_monte_carlo_study`` in
+``R/05_monte_carlo_evaluation.R``: repeatedly hold out a random subset of
 cameras, predict their curves from the remaining ("training") cameras via
 UTrK and UCoK, and compute the root-mean-squared prediction error (RMSPE)
 per held-out camera.
@@ -37,7 +37,7 @@ def monte_carlo_rmspe(
     utrk_kwargs: dict | None = None,
     ucok_kwargs: dict | None = None,
 ) -> MCResult:
-    """Equivalent to running ``generate.path(m, df)`` (R) ``n_iter`` times.
+    """Equivalent to running ``monte_carlo_iteration()`` (R) ``n_iter`` times.
 
     curves: (n_time, n_camera) DataFrame, columns = camera_id, index = DOY.
     coords: (n_camera, [lat, lon]) DataFrame aligned to curves.columns.
@@ -94,8 +94,8 @@ def monte_carlo_rmspe(
 
 def summarize(mc: MCResult) -> pd.DataFrame:
     """Overall mean/median/std across all MC iterations, mirroring the
-    ``mean_RMSPE`` / ``median_RMSPE`` / ``Std.dev_RMSPE`` outputs of
-    ``generate.path`` in R."""
+    ``mean_RMSPE`` / ``median_RMSPE`` / ``Std.dev_RMSPE`` outputs of the R
+    implementation."""
     df = mc.per_iteration
     summary = {
         "mean_RMSPE_UTrK": df["mean_RMSPE_UTrK"].mean(),

@@ -3,10 +3,8 @@
 #' ============================================================================
 #'
 #' Builds the analysis-ready (DOY x camera) greenness matrix and matching
-#' (lat, lon) coordinates, from the compiled CSVs in data/raw/. This
-#' reproduces -- and documents explicitly -- the cleaning steps that were
-#' previously scattered across several private exploratory scripts
-#' (SpatialTemporalGreenness.R in particular):
+#' (lat, lon) coordinates, from the compiled CSVs in data/raw/. The cleaning
+#' steps are:
 #'
 #'   1. Read one CSV per camera, keep only the requested year's column.
 #'   2. Map "case number" (the file-name index) to the real AMOS camera id.
@@ -51,7 +49,7 @@ case_number_from_filename <- function(path) {
 #' @param locations_xlsx Path to amos_locations.xlsx (camera id -> lat, lon).
 #' @param year Year to extract (default 2015, matching the paper).
 #' @param max_missing_frac Drop cameras with more than this fraction of
-#'   missing days (default 0.5, i.e. > 250 / 365 as in the original analysis).
+#'   missing days (default 0.5, i.e. > 250 / 365, matching the paper).
 #' @param drop_location_outliers If TRUE, drop cameras whose lat or lon is a
 #'   boxplot.stats() outlier of the retained set (default TRUE).
 #' @param jitter_duplicate_coords If TRUE (default), nudge cameras that share
