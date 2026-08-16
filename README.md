@@ -33,7 +33,6 @@ Both are evaluated with a Monte Carlo leave-out study (random train/test camera 
 | UTrK / UCoK prediction | [`04_kriging_models.R`](R/04_kriging_models.R): `fit_utrk()`, `fit_ucok()` | [`greenness.kriging`](src/greenness/kriging.py) |
 | Monte Carlo RMSPE evaluation | [`05_monte_carlo_evaluation.R`](R/05_monte_carlo_evaluation.R): `run_monte_carlo_study()` | [`greenness.evaluate`](src/greenness/evaluate.py) |
 | End-to-end example run | [`06_run_analysis_2015.R`](R/06_run_analysis_2015.R) | `scripts/run_pipeline.py` |
-| Optimal new-camera sampling design (extension, not in the paper) | [`07_optimal_sampling_design.R`](R/07_optimal_sampling_design.R) | — |
 | Figures (raw vs. smoothed curves) | [`08_figures.R`](R/08_figures.R): `plot_smoothed_curves()` | `scripts/make_figures.py` |
 
 Two modeling choices are shared between the R and Python implementations, documented here so results are interpretable:
@@ -67,7 +66,6 @@ greenness/
 │   ├── 04_kriging_models.R         #   fit_utrk(), fit_ucok()
 │   ├── 05_monte_carlo_evaluation.R #   run_monte_carlo_study(), summarize_monte_carlo()
 │   ├── 06_run_analysis_2015.R      #   end-to-end example run (source 00-05 first)
-│   ├── 07_optimal_sampling_design.R#   extension: simulated-annealing new-camera placement
 │   └── 08_figures.R                #   plot_smoothed_curves(): raw vs. smoothed curve figure
 ├── paper/                  # the published paper (PDF)
 ├── data/
