@@ -97,11 +97,10 @@ def build_dataset(
     ----------
     fill_missing:
         ``"median"`` fills remaining NaNs per-camera with that camera's
-        median (matches the quick-and-dirty imputation used for the raw
-        exploratory plots in the R scripts). ``"ffill"`` does a forward-fill
-        (Last Observation Carried Forward), matching the paper's stated
-        missing-value handling. ``None`` leaves NaNs in place (needed if you
-        want to do the imputation yourself, e.g. before smoothing).
+        median. ``"ffill"`` does a forward-fill (Last Observation Carried
+        Forward), matching the paper's stated missing-value handling.
+        ``None`` leaves NaNs in place (needed if you want to do the
+        imputation yourself, e.g. before smoothing).
 
     Returns
     -------

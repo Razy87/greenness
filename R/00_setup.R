@@ -32,7 +32,7 @@ if (length(missing_packages) > 0) {
     "The following packages are not installed and are required:\n  ",
     paste(missing_packages, collapse = ", "),
     "\nMost are on CRAN via install.packages(); `fdagstat` is on GitHub, e.g.\n",
-    "  remotes::install_github(\"SpatioTemporal/fdagstat\")"
+    "  remotes::install_github(\"ogru/fdagstat\")"
   )
 }
 
